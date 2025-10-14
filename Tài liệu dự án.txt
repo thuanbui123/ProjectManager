@@ -1,0 +1,90 @@
+A. Yêu cầu dự án
+1. Quản Lý Tài Khoản và Quyền Truy Cập An Toàn
+ Hệ thống cần cung cấp một cổng đăng nhập và đăng ký an toàn, cho phép mỗi nhân viên sử dụng tài khoản cá nhân để truy cập. 
+Yêu cầu tiên quyết là việc phân quyền phải được xử lý chặt chẽ và thông minh. Sẽ có ba cấp độ người dùng chính: Quản trị viên (Admin) có quyền cao nhất, 
+Quản lý Dự án (PM) và Thành viên nhóm (Member). Điểm khó và quan trọng nhất là tính linh hoạt trong phân quyền: Một nhân viên có thể là PM ở dự án này nhưng chỉ là 
+thành viên ở dự án khác. Khi người dùng truy cập bất kỳ dữ liệu nào (xem, sửa, xóa), hệ thống phải tự động kiểm tra xem họ có quyền hạn đó trong ngữ cảnh dự án đang 
+xem hay không. Điều này đảm bảo tính bảo mật và minh bạch cho từng dự án riêng biệt. 
+2. Quản Lý Dự Án và Phân Bổ Nhân Lực Ứng dụng phải là nơi tập trung để tạo và quản lý tất cả các dự án của công ty.   
+  Người dùng có quyền (chủ yếu là PM) phải có thể dễ dàng thiết lập một dự án mới, bao gồm việc đặt tên, mô tả chi tiết, và xác định ngày bắt đầu/kết thúc 
+dự kiến. Sau đó, PM cần có khả năng gán nhân viên vào dự án và chỉ định vai trò cụ thể cho từng người (ví dụ: "Trưởng nhóm Kỹ thuật," "Người thiết kế"). 
+Các dự án cũng phải có trạng thái rõ ràng như "Đang Tiến hành," "Hoàn thành," hay "Tạm hoãn," giúp mọi người dễ dàng theo dõi tình trạng tổng thể. 
+3. Tổ Chức Công Việc và Trải Nghiệm Người Dùng
+ Mỗi dự án sẽ chứa nhiều công việc (Task). Người dùng phải có thể tạo các công việc mới với đầy đủ thông tin: tên, mô tả, ngày đến hạn, mức độ ưu tiên và người chịu 
+trách nhiệm thực hiện. Chức năng cốt lõi là khả năng xem và quản lý các công việc này trên một bảng trực quan (Kanban Board). Người dùng phải có thể kéo và thả 
+(Drag & Drop) công việc giữa các cột trạng thái (Ví dụ: từ "Đang làm" sang "Đã xong") một cách mượt mà. Bên cạnh đó, mỗi công việc cần có không gian riêng để mọi 
+người bình luận, cập nhật và theo dõi lịch sử thay đổi, tạo thành một trung tâm thông tin hoàn chỉnh cho từng nhiệm vụ. 
+4. Báo Cáo, Tổng Quan và Hiệu Suất 
+Ứng dụng cần cung cấp một bảng điều khiển (Dashboard) hiệu quả, nơi hiển thị các chỉ số quan trọng ngay lập tức, ví dụ: bao nhiêu công việc đã quá hạn, tỷ lệ hoàn 
+thành dự án tổng thể. Đặc biệt, hệ thống phải có khả năng hiển thị các công việc trên dòng thời gian dưới dạng Biểu đồ Gantt để giúp PM dễ dàng lập kế hoạch và 
+theo dõi tiến độ. Quan trọng nhất, các trang hiển thị dữ liệu lớn như danh sách công việc hoặc báo cáo tổng hợp phải được tối ưu hóa để tải và cuộn cực kỳ nhanh và 
+mượt mà (ngay cả khi có hàng ngàn bản ghi), đảm bảo trải nghiệm người dùng không bị gián đoạn hay chậm trễ.
+B Phân tích
+1. Phân tích yêu cầu
+* Mục tiêu hệ thống
+- Quản lý nhiều dự án, nhiều nhóm và nhiều cấp quyền
+- Dễ mở rộng, an toàn, trực quan, hiệu suất cao
+- Có khả năng đa tổ chức nếu mở rộng sau này
+* Cấu trúc hệ thống
+- Frontend: Angular
+- Backend: .net
+- Database: sql server
+- Redis
+2. Mô hình quản lý người dùng và phân quyền
+* Cấu trúc cơ bản
+User
+├── id
+├── name, email, password_hash
+├── global_role (Admin / NormalUser)
+└── created_at, last_login
+
+Project
+├── id, name, description
+├── start_date, end_date, status
+└── created_by (User.id)
+
+ProjectMember
+├── user_id
+├── project_id
+├── role_in_project (PM / Member / Custom role)
+└── permissions (view, edit, assign, delete flags)
+* Cơ chế phân quyền
+- Khi người dùng đăng nhập -> hệ thống load tất cả quyền tương ứng với từng dự án.
+- Mọi thao tác (xem, sửa, xóa, tạo, assign) đều được middleware kiểm tra
+* Một người có thể là:
+- Admin: có phân quyền toàn hệ thống
+- PM: có quyền quản lý trong dự án được phân công
+- Member: Chỉ có quyền được giao 
+3. Chức năng chính
+* Quản lý tài khoản và bảo mật
+- Đăng ký / Đăng nhập / quên mật khẩu (JWT + Refresh Token)
+- Xác thực 2 bước OTP
+- Quản lý vai trò và quyền truy cập trong từng dự án
+- Nhật ký hoạt động
+* Quản lý dự án và phân bổ nhân lực
+- Tạo / sửa / xóa dự án: Tên, mô tả, ngày bắt đầu, ngày kết thúc, trạng thái
+- Gán nhân viên vào dự án: PM chỉ định vai trò và quyền trong dự án
+- Theo dõi trạng thái dự án: "Sắp bắt đầu", "Đang tiến hành", "Tạm hoãn", "Hoàn thành", "Hủy"
+- Dữ liệu liên kết: Một nhân viên có thể tham gia nhiều dự án với vai trò khác nhau
+Ví dụ: Project A -> PM: Bùi Văn Thuân
+Project B -> Member: Bùi Văn Thuân
+* Quản lý công việc:
+- Tạo công việc: tiêu đề, mô tả, deadline, ưu tiên, người phụ trách
+- Trạng thái: 
++ Chưa bắt đầu, đang xử lý, Chờ nhận xét, đã hoàn thành
++ Drag & Drop cập nhật trạng thái trực quan
+- Giao diện
++ Dữ liệu luôn được cập nhật mới nhất
++ Có thể lọc theo người phụ trách, ưu tiên, deadline
+- Bình luận và hoạt động:
++ Comment, mention người dùng (@username)
++ Lưu lịch sử thay đổi (ai thay đổi, đổi gì, khi nào)
+* Báo cáo và dashboard
+- Bảng điểu khiển tổng quan:
++ % hoàn thành dự án
++ Số công việc quá hạn, đang làm, hoàn tất
+- Hiệu suất cá nhân 
++ Tổng task được giao 
++ Tỷ lệ hoàn thành đúng hạn
++ Hiệu suất nhóm: năng suất theo dự án
+
