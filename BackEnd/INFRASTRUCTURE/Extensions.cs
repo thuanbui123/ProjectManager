@@ -17,6 +17,7 @@ public static class Extensions
             )
         );
 
+        services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;

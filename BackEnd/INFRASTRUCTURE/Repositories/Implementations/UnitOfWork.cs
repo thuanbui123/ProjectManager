@@ -9,7 +9,7 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly ProjectDbContext _context;
     private IDbContextTransaction? _currentTransaction;
-
+    public IStoredProcedureExecutor StoredProcedures { get; }
     public IRepository<UserEntity> Users { get; }
     public IRepository<RoleEntity> Roles { get; }
     public IRepository<UserRoleEntity> UserRoles { get; }
@@ -21,9 +21,10 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<AttachmentEntity> Attachments { get; }
     public IRepository<NotificationEntity> Notifications { get; }
 
-    public UnitOfWork(ProjectDbContext context)
+    public UnitOfWork(ProjectDbContext context, IStoredProcedureExecutor spExecutor)
     {
         _context = context;
+        StoredProcedures = spExecutor;
 
         Users = new Repository<UserEntity>(context);
         Roles = new Repository<RoleEntity>(context);

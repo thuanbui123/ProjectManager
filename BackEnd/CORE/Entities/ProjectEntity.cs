@@ -5,6 +5,9 @@ public class ProjectEntity
     [Key]
     public Guid Id { get; set; }
 
+    [Required]
+    public string Code { get; set; } = string.Empty;
+
     [Required, MaxLength(255)]
     public string Name { get; set; } = string.Empty;
 

@@ -5,6 +5,8 @@ namespace INFRASTRUCTURE.Repositories.Abstractions;
 
 public interface IUnitOfWork : IDisposable
 {
+    IStoredProcedureExecutor StoredProcedures { get; }
+
     IRepository<UserEntity> Users { get; }
     IRepository<RoleEntity> Roles { get; }
     IRepository<UserRoleEntity> UserRoles { get; }
