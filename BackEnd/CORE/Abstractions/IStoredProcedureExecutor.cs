@@ -1,4 +1,4 @@
-﻿namespace INFRASTRUCTURE.Repositories.Abstractions;
+﻿namespace CORE.Abstractions;
 
 public interface IStoredProcedureExecutor
 {

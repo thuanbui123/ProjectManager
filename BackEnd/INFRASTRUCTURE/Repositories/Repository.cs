@@ -1,9 +1,8 @@
 ﻿using INFRASTRUCTURE.AppDbContext;
-using INFRASTRUCTURE.Repositories.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace INFRASTRUCTURE.Repositories.Implementations;
+namespace INFRASTRUCTURE.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class
 {

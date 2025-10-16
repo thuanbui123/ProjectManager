@@ -1,12 +1,10 @@
 ﻿using CORE.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace INFRASTRUCTURE.Repositories.Abstractions;
+namespace CORE.Abstractions;
 
 public interface IUnitOfWork : IDisposable
 {
-    IStoredProcedureExecutor StoredProcedures { get; }
-
     IRepository<UserEntity> Users { get; }
     IRepository<RoleEntity> Roles { get; }
     IRepository<UserRoleEntity> UserRoles { get; }

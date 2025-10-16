@@ -10,6 +10,7 @@ public class ProjectDbContext : DbContext
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<RoleEntity> Roles { get; set; }
     public DbSet<UserRoleEntity> UserRoles { get; set; }
+    public DbSet<UserRefreshTokenEntity> UserRefreshToken { get; set; }
     public DbSet<ProjectEntity> Projects { get; set; }
     public DbSet<ProjectMemberEntity> ProjectMembers { get; set; }
     public DbSet<TaskEntity> Tasks { get; set; }
@@ -30,6 +31,12 @@ public class ProjectDbContext : DbContext
         modelBuilder.Entity<UserRoleEntity>()
             .HasOne(ur => ur.User)
             .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<UserRefreshTokenEntity>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRefreshToken)
             .HasForeignKey(ur => ur.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 

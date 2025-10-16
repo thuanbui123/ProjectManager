@@ -20,7 +20,6 @@ public class UserEntity
     public bool IsActive { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
 
-    public string? Token { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string? CreatedBy { get; set; }
     public DateTime? UpdatedAt { get; set; }
@@ -28,6 +27,7 @@ public class UserEntity
 
     // Navigation
     public ICollection<UserRoleEntity>? UserRoles { get; set; }
+    public ICollection<UserRefreshTokenEntity>? UserRefreshToken { get; set; }
     public ICollection<ProjectMemberEntity>? ProjectMembers { get; set; }
     public ICollection<TaskCommentEntity>? TaskComments { get; set; }
     public ICollection<NotificationEntity>? Notifications { get; set; }

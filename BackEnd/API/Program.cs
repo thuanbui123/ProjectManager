@@ -1,8 +1,15 @@
 using API;
 using CORE;
 using INFRASTRUCTURE;
-
+using INFRASTRUCTURE.AppDbContext;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ProjectDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly(typeof(ProjectDbContext).Assembly.FullName)
+    )
+);
 
 builder.Services.AddApi(builder.Configuration);
 builder.Services.AddCore(builder.Configuration);
@@ -24,6 +31,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

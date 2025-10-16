@@ -1,15 +1,13 @@
 ﻿using CORE.Entities;
 using INFRASTRUCTURE.AppDbContext;
-using INFRASTRUCTURE.Repositories.Abstractions;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace INFRASTRUCTURE.Repositories.Implementations;
+namespace INFRASTRUCTURE.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ProjectDbContext _context;
     private IDbContextTransaction? _currentTransaction;
-    public IStoredProcedureExecutor StoredProcedures { get; }
     public IRepository<UserEntity> Users { get; }
     public IRepository<RoleEntity> Roles { get; }
     public IRepository<UserRoleEntity> UserRoles { get; }
@@ -17,14 +15,14 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<ProjectMemberEntity> ProjectMembers { get; }
     public IRepository<TaskEntity> Tasks { get; }
     public IRepository<TaskCommentEntity> TaskComments { get; }
+    public IRepository<UserRefreshTokenEntity> UrfToken { get; }
     public IRepository<TaskHistoryEntity> TaskHistories { get; }
     public IRepository<AttachmentEntity> Attachments { get; }
     public IRepository<NotificationEntity> Notifications { get; }
 
-    public UnitOfWork(ProjectDbContext context, IStoredProcedureExecutor spExecutor)
+    public UnitOfWork(ProjectDbContext context)
     {
         _context = context;
-        StoredProcedures = spExecutor;
 
         Users = new Repository<UserEntity>(context);
         Roles = new Repository<RoleEntity>(context);
@@ -36,6 +34,7 @@ public class UnitOfWork : IUnitOfWork
         TaskHistories = new Repository<TaskHistoryEntity>(context);
         Attachments = new Repository<AttachmentEntity>(context);
         Notifications = new Repository<NotificationEntity>(context);
+        UrfToken = new Repository<UserRefreshTokenEntity>(context);
     }
 
     public async Task<IDbContextTransaction> BeginTransactionAsync()

@@ -4,6 +4,7 @@ using INFRASTRUCTURE.AppDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INFRASTRUCTURE.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    partial class ProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251015155613_addUserRefreshToken")]
+    partial class addUserRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -427,7 +430,7 @@ namespace INFRASTRUCTURE.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserRefreshToken");
+                    b.ToTable("UserRefreshTokenEntity");
                 });
 
             modelBuilder.Entity("CORE.Entities.UserRoleEntity", b =>
