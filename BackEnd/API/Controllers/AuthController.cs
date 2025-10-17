@@ -1,9 +1,5 @@
-﻿using CORE.Abstractions;
-using CORE.Entities;
-using CORE.Models;
+﻿using CORE.Models;
 using CORE.Services.Abstractions;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,11 +12,13 @@ public class AuthController : ControllerBase
 {
     private readonly IJwtService _jwtService;
     private readonly IAuthService _authService;
+    private readonly IEmailService _emailService;
 
-    public AuthController(IJwtService jwtService, IAuthService authService)
+    public AuthController(IJwtService jwtService, IAuthService authService, IEmailService emailService)
     {
         _jwtService = jwtService;
         _authService = authService;
+        _emailService = emailService;
     }
 
     [HttpPost("login")]
@@ -84,7 +82,14 @@ public class AuthController : ControllerBase
         });
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpGet("admin")]
-    public IActionResult AdminOnly() => Ok("✅ You are an Admin");
+    //[Authorize(Roles = "Admin")]
+    [HttpGet("test-send-email")]
+    public async Task<IActionResult> TestSendEmail()
+    {
+        await _emailService.SendWelcomeEmailAsync("Thuanbui18822@gmail.com", "Test", "Thuanbui", "abc");
+        return Ok(new
+        {
+            Message = "Đang xử lý gửi email"
+        });
+    }
 }

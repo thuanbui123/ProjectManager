@@ -13,6 +13,7 @@ public static class Extensions
         services.AddAutoMapper(typeof(UserRefreshTokenProfile).Assembly);
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IEmailService, EmailService>();
         return services;
     }
 }

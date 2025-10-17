@@ -1,4 +1,5 @@
-﻿using INFRASTRUCTURE.Repositories;
+﻿using INFRASTRUCTURE.Externals;
+using INFRASTRUCTURE.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,7 @@ public static class Extensions
         services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IEmailSender, SmtpEmailSender>();
         return services;
     }
 }
