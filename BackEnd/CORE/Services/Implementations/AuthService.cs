@@ -48,7 +48,7 @@ public class AuthService : IAuthService
             Password = passwordHash,
             RoleName = Constants.USER
         });
-        Console.WriteLine(rs);
+
         switch (rs.FirstOrDefault()!.ResultCode)
         {
             case -1:

@@ -1,5 +1,6 @@
 using API;
 using CORE;
+using CORE.Exceptions;
 using INFRASTRUCTURE;
 using INFRASTRUCTURE.AppDbContext;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<HandleExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
