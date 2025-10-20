@@ -1,6 +1,7 @@
 using API;
 using CORE;
 using CORE.Exceptions;
+using Hangfire;
 using INFRASTRUCTURE;
 using INFRASTRUCTURE.AppDbContext;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,15 @@ builder.Services.AddDbContext<ProjectDbContext>(options =>
         b => b.MigrationsAssembly(typeof(ProjectDbContext).Assembly.FullName)
     )
 );
+
+var hangfireConnection = builder.Configuration.GetConnectionString("HangfireConnection");
+
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+    .UseSqlServerStorage(hangfireConnection)
+);
+
+builder.Services.AddHangfireServer();
 
 builder.Services.AddApi(builder.Configuration);
 builder.Services.AddCore(builder.Configuration);
@@ -23,6 +33,8 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseHangfireDashboard();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

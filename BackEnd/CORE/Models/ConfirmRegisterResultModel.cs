@@ -1,8 +1,7 @@
 ﻿namespace CORE.Models;
 
-public class RegisterResponseModel
+public class ConfirmRegisterResultModel
 {
-    public Guid UserId { get; set; }
     public int ResultCode { get; set; } = 0;
     public string Message { get; set; } = string.Empty;
 }

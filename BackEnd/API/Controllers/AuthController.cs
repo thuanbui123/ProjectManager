@@ -1,5 +1,9 @@
-﻿using CORE.Models;
+﻿using CORE.Abstractions;
+using CORE.Entities;
+using CORE.Models;
 using CORE.Services.Abstractions;
+using Hangfire;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,13 +16,13 @@ public class AuthController : ControllerBase
 {
     private readonly IJwtService _jwtService;
     private readonly IAuthService _authService;
-    private readonly IEmailService _emailService;
+    private readonly IBackgroundJobClient _jobClient;
 
-    public AuthController(IJwtService jwtService, IAuthService authService, IEmailService emailService)
+    public AuthController(IJwtService jwtService, IAuthService authService, IBackgroundJobClient jobClient)
     {
         _jwtService = jwtService;
         _authService = authService;
-        _emailService = emailService;
+        _jobClient = jobClient;
     }
 
     [HttpPost("login")]
@@ -48,9 +52,21 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestModel request)
     {
-
-        var rs = await _authService.RegisterUser(request.Username, request.Email, request.Password);
-        return StatusCode(201, rs);
+        var confirmationToken = Guid.NewGuid().ToString();
+        var rs = await _authService.RegisterUser(request.Username, request.Email, request.Password, confirmationToken);
+        var userId = rs.Item2 != null ? rs.Item2.ToString() : "";
+        var confirmLink = GenerateLinkConfirm(userId, confirmationToken);
+        _jobClient.Enqueue<IEmailService>(
+            // Sử dụng Lambda để chỉ định phương thức cần gọi.
+            // Hangfire sẽ tự động tìm IEmailService và gọi phương thức SendWelcomeEmailAsync.
+            service => service.SendWelcomeEmailAsync(
+                request.Email,
+                $"Chào mừng {request.Username}! Bắt đầu Quản lý Dự án của bạn ngay.",
+                request.Username,
+                confirmLink
+            )
+        );
+        return StatusCode(201, rs.Item1);
     }
 
     [HttpPost("refresh")]
@@ -82,14 +98,35 @@ public class AuthController : ControllerBase
         });
     }
 
-    //[Authorize(Roles = "Admin")]
-    [HttpGet("test-send-email")]
-    public async Task<IActionResult> TestSendEmail()
+    private string GenerateLinkConfirm(string? userId, string confirmationToken)
     {
-        await _emailService.SendWelcomeEmailAsync("Thuanbui18822@gmail.com", "Test", "Thuanbui", "abc");
-        return Ok(new
-        {
-            Message = "Đang xử lý gửi email"
-        });
+        var host = Request.Host.ToUriComponent();
+        var confirmationLink = Url.Action(
+            "ConfirmEmail",
+            "Auth",
+            new { userId = userId, token = confirmationToken },
+            Request.Scheme,
+            host
+        );
+        return confirmationLink ?? string.Empty;
     }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] Guid userId, [FromQuery] string token)
+    {
+        var rs = await _authService.ConfirmRegister(userId, token);
+        if (rs.ResultCode != 1) return BadRequest(rs.Message);
+        return Ok(rs.Message);
+    }
+
+    //[Authorize(Roles = "Admin")]
+    //[HttpGet("test-send-email")]
+    //public async Task<IActionResult> TestSendEmail()
+    //{
+    //    await _emailService.SendWelcomeEmailAsync("Thuanbui18822@gmail.com", "Test", "Thuanbui", "abc");
+    //    return Ok(new
+    //    {
+    //        Message = "Đang xử lý gửi email"
+    //    });
+    //}
 }

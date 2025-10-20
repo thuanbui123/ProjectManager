@@ -17,6 +17,10 @@ public class UserEntity
 
     public string? AvatarUrl { get; set; }
 
+    public bool EmailConfirmed { get; set; } = false;
+
+    public string ConfirmationToken {get; set;} = string.Empty;
+
     public bool IsActive { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
 

@@ -35,7 +35,11 @@ public static class EmailTemplateGenerator
                       <p>
                         <a href='{verificationLink}' class='btn'>Xác minh Email</a>
                       </p>
+                        <p class='warning'>
+                          LƯU Ý QUAN TRỌNG: Liên kết này chỉ có hiệu lực trong vòng **24 giờ** kể từ khi bạn nhận được email này. Vui lòng hoàn tất xác nhận sớm để tránh tài khoản bị khóa.
+                        </p>
                       <p>Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
+                      <p>Trân trọng,<br>Đội ngũ Hỗ trợ Hệ thống Quản lý Dự án.</p>
                     </body>
                     </html>";
     }

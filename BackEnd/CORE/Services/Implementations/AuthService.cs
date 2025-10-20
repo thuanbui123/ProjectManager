@@ -3,6 +3,8 @@ using CORE.Commons;
 using CORE.Entities;
 using CORE.Models;
 using CORE.Services.Abstractions;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace CORE.Services.Implementations;
 
@@ -17,6 +19,16 @@ public class AuthService : IAuthService
         _userRepository = userRepository;
         _storedProcedureExecutor = storedProcedureExecutor;
         _unitOfWork = unitOfWork;
+    }
+
+    public async Task<ConfirmRegisterResultModel> ConfirmRegister(Guid userId, string token)
+    {
+        var rs = await _storedProcedureExecutor.QueryAsync<ConfirmRegisterResultModel>("ConfirmEmail", new
+        {
+            UserId = userId,
+            Token = token
+        });
+        return rs.FirstOrDefault() ?? new ConfirmRegisterResultModel();
     }
 
     public async Task<LoginResponseModel?> Login(string email, string password)
@@ -38,7 +50,7 @@ public class AuthService : IAuthService
         return rs.FirstOrDefault();
     }
 
-    public async Task<string> RegisterUser (string username, string email, string password)
+    public async Task<(string, Guid?)> RegisterUser (string username, string email, string password, string confirmationToken)
     {
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
         var rs = await _storedProcedureExecutor.QueryAsync<RegisterResponseModel>("RegisterAccount", new
@@ -46,19 +58,20 @@ public class AuthService : IAuthService
             Username = username,
             Email = email,
             Password = passwordHash,
-            RoleName = Constants.USER
+            RoleName = Constants.USER,
+            ConfirmationToken = confirmationToken
         });
 
         switch (rs.FirstOrDefault()!.ResultCode)
         {
             case -1:
-                return "Email đã được sử dụng để đăng ký tài khoản. Vui lòng nhập email khác";
+                return ("Email đã được sử dụng để đăng ký tài khoản. Vui lòng nhập email khác", null);
             case 0:
-                return "Xảy ra lỗi khi đăng ký tài khoản. Vui lòng thử lại sau ít phút";
+                return ("Xảy ra lỗi khi đăng ký tài khoản. Vui lòng thử lại sau ít phút", null);
             case 1:
-                return "Đăng ký tài khoản thành công";
+                return ("Đăng ký tài khoản thành công", rs.FirstOrDefault()!.UserId);
             default:
-                return "";
+                return ("", null);
         }
     }
 }
