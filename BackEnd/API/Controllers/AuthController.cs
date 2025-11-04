@@ -1,9 +1,6 @@
-﻿using CORE.Abstractions;
-using CORE.Entities;
-using CORE.Models;
+﻿using CORE.Models;
 using CORE.Services.Abstractions;
 using Hangfire;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -54,6 +51,7 @@ public class AuthController : ControllerBase
     {
         var confirmationToken = Guid.NewGuid().ToString();
         var rs = await _authService.RegisterUser(request.Username, request.Email, request.Password, confirmationToken);
+        if (rs.Item2 == null) return BadRequest(rs.Item1);
         var userId = rs.Item2 != null ? rs.Item2.ToString() : "";
         var confirmLink = GenerateLinkConfirm(userId, confirmationToken);
         _jobClient.Enqueue<IEmailService>(
@@ -118,15 +116,4 @@ public class AuthController : ControllerBase
         if (rs.ResultCode != 1) return BadRequest(rs.Message);
         return Ok(rs.Message);
     }
-
-    //[Authorize(Roles = "Admin")]
-    //[HttpGet("test-send-email")]
-    //public async Task<IActionResult> TestSendEmail()
-    //{
-    //    await _emailService.SendWelcomeEmailAsync("Thuanbui18822@gmail.com", "Test", "Thuanbui", "abc");
-    //    return Ok(new
-    //    {
-    //        Message = "Đang xử lý gửi email"
-    //    });
-    //}
 }

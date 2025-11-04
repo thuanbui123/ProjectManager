@@ -3,8 +3,6 @@ using CORE.Commons;
 using CORE.Entities;
 using CORE.Models;
 using CORE.Services.Abstractions;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
 
 namespace CORE.Services.Implementations;
 
@@ -21,14 +19,14 @@ public class AuthService : IAuthService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<ConfirmRegisterResultModel> ConfirmRegister(Guid userId, string token)
+    public async Task<StoredProcedureResult> ConfirmRegister(Guid userId, string token)
     {
-        var rs = await _storedProcedureExecutor.QueryAsync<ConfirmRegisterResultModel>("ConfirmEmail", new
+        var rs = await _storedProcedureExecutor.QueryAsync<StoredProcedureResult>("ConfirmEmail", new
         {
             UserId = userId,
             Token = token
         });
-        return rs.FirstOrDefault() ?? new ConfirmRegisterResultModel();
+        return rs.FirstOrDefault() ?? new StoredProcedureResult();
     }
 
     public async Task<LoginResponseModel?> Login(string email, string password)

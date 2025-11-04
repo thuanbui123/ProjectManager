@@ -14,6 +14,7 @@ public static class Extensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IProjectService, ProjectService>();
         return services;
     }
 }

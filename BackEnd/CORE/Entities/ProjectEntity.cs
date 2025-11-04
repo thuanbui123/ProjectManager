@@ -19,6 +19,8 @@ public class ProjectEntity
     [MaxLength(100)]
     public string Status { get; set; } = "InProgress";
 
+    public bool IsDeleted { get; set; } = false;
+
     public string? CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
